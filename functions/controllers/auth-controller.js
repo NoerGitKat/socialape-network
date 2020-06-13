@@ -1,8 +1,15 @@
 const firebase = require('firebase');
 const admin = require('firebase-admin');
+const { validationResult } = require('express-validator');
 
 const signup = async (req, res) => {
 	const { email, password, confirmPassword, handle } = req.body;
+
+	// Validation
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
 
 	try {
 		const foundUser = await admin.firestore().doc(`/users/${handle}`).get();
@@ -42,4 +49,25 @@ const signup = async (req, res) => {
 	}
 };
 
+const login = async (req, res) => {
+	const { email, password } = req.body;
+
+	// Validation
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+
+	try {
+		const loggedInUser = await firebase.auth().signInWithEmailAndPassword(email, password);
+		const idToken = await loggedInUser.user.getIdToken();
+
+		return res.status(200).json({ token: idToken });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json(err);
+	}
+};
+
 exports.signup = signup;
+exports.login = login;
