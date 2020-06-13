@@ -3,11 +3,11 @@ const admin = require('firebase-admin');
 const getScreams = async (req, res) => {
 	try {
 		// Access Firebase DB
-		const screamsCollection = await admin.firestore().collection('screams').get();
+		const screamsCollection = await admin.firestore().collection('screams').orderBy('createdAt', 'desc').get();
 		const screams = [];
 		// Get and push objects in variable
-		const screamDocs = await screamsCollection.forEach((doc) => {
-			screams.push(doc.data());
+		const screamDocs = screamsCollection.forEach((doc) => {
+			screams.push({ ...doc.data(), screamId: doc.id });
 		});
 		return res.json(screams);
 	} catch (err) {
@@ -21,7 +21,7 @@ const createScream = async (req, res) => {
 	const newScream = {
 		handle,
 		body,
-		createdAt: admin.firestore.Timestamp.fromDate(new Date()),
+		createdAt: new Date().toISOString(),
 	};
 
 	try {
