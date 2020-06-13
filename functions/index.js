@@ -4,9 +4,12 @@ const express = require('express');
 const firebase = require('firebase');
 
 const app = express();
+
+// Routers
 const screamsRouter = require('./routes/screams-router');
 const authRouter = require('./routes/auth-router');
 
+const serviceAccount = require('./serviceAccountKey.json');
 const firebaseConfig = {
 	apiKey: 'AIzaSyCpDis559px2NoQO0WACl0S4xpo_RPihtI',
 	authDomain: 'socialape-8cb27.firebaseapp.com',
@@ -19,7 +22,10 @@ const firebaseConfig = {
 };
 
 // Init application
-admin.initializeApp();
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: 'https://socialape-8cb27.firebaseio.com',
+});
 firebase.initializeApp(firebaseConfig);
 
 app.use(express.json());
