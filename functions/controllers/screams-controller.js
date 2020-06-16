@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { validationResult } = require('express-validator');
 
 const getScreams = async (req, res) => {
 	try {
@@ -17,7 +18,15 @@ const getScreams = async (req, res) => {
 };
 
 const createScream = async (req, res) => {
-	const { handle, body } = req.body;
+	const { body } = req.body;
+	const { handle } = req.user;
+
+	// Validation
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+
 	const newScream = {
 		handle,
 		body,

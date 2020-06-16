@@ -9,6 +9,8 @@ const validateSignup = [
 	check('email').isEmail().withMessage('You must fill in a valid email address!'),
 	check('password').isLength({ min: 5 }).withMessage('Your password must be at least 5 characters long!'),
 ];
+const validateScream = [check('body').not().isEmpty().withMessage('You have to fill in a scream!')];
 
 exports.validateLogin = validateLogin;
 exports.validateSignup = validateSignup;
+exports.validateScream = validateScream;
