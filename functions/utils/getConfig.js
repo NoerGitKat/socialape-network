@@ -11,7 +11,7 @@ const getConfig = () => {
 		authDomain: 'socialape-8cb27.firebaseapp.com',
 		databaseURL: 'https://socialape-8cb27.firebaseio.com',
 		projectId: 'socialape-8cb27',
-		storageBucket: 'socialape-8cb27.appspot.com',
+		storageBucket: config.socialape.storage_id,
 		messagingSenderId: '594538726867',
 		appId: config.socialape.app_id,
 		measurementId: 'G-PVC3W5P5LD',

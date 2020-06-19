@@ -1,5 +1,6 @@
 const firebase = require('firebase');
 const admin = require('firebase-admin');
+const axios = require('axios');
 const { validationResult } = require('express-validator');
 
 const signup = async (req, res) => {
@@ -31,6 +32,7 @@ const signup = async (req, res) => {
 		const userCreds = {
 			email,
 			handle,
+			imageUrl: `https://api.adorable.io/avatars/285/${handle}.png`,
 			createdAt: new Date().toISOString(),
 			userId: createdUser.user.uid,
 		};
