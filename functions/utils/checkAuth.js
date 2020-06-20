@@ -3,13 +3,15 @@ const admin = require('firebase-admin');
 const checkAuth = async (req, res, next) => {
 	const { authorization } = req.headers;
 
+	// First check if the request contains a token at all
 	let idToken;
 	if (authorization && authorization.startsWith('Bearer ')) {
 		idToken = authorization.split('Bearer ')[1];
 	} else {
-		return res.status(403).json({ message: 'You must be logged in' });
+		return res.status(403).json({ message: 'You must be logged in!' });
 	}
 
+	// Then verify the token
 	try {
 		const verifiedToken = await admin.auth().verifyIdToken(idToken);
 

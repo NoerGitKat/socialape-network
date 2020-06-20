@@ -3,6 +3,7 @@ const BusBoy = require('busboy');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const { validationResult } = require('express-validator');
 
 const firebaseConfig = require('./../utils/getConfig')();
 
@@ -63,4 +64,55 @@ const uploadProfilePic = (req, res) => {
 	busboy.end(req.rawBody);
 };
 
+const getUserDetails = async (req, res) => {
+	const { handle } = req.user;
+	try {
+		let userDetails = {};
+		const userDoc = await admin.firestore().doc(`/users/${handle}`).get();
+
+		if (userDoc) {
+			userDetails.credentials = userDoc.data();
+		}
+
+		const likesCollection = await admin.firestore().collection('likes').where('handle', '==', handle).get();
+
+		userDetails.likes = [];
+
+		likesCollection.forEach((doc) => userDetails.likes.push(doc.data()));
+
+		return res.status(200).json(userDetails);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err });
+	}
+};
+
+const addUserDetails = async (req, res) => {
+	const { bio, website, location } = req.body;
+	const { handle } = req.user;
+
+	// Validation
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+
+	try {
+		const userDetails = {
+			bio,
+			website,
+			location,
+		};
+
+		await admin.firestore().doc(`/users/${handle}`).update(userDetails);
+
+		return res.status(201).json({ message: 'User details successfully updated!' });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err });
+	}
+};
+
 exports.uploadProfilePic = uploadProfilePic;
+exports.getUserDetails = getUserDetails;
+exports.addUserDetails = addUserDetails;

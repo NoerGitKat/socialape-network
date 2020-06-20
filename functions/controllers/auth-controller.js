@@ -1,6 +1,5 @@
 const firebase = require('firebase');
 const admin = require('firebase-admin');
-const axios = require('axios');
 const { validationResult } = require('express-validator');
 
 const signup = async (req, res) => {
