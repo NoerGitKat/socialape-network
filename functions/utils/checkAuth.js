@@ -20,6 +20,7 @@ const checkAuth = async (req, res, next) => {
 		const user = await admin.firestore().collection('users').where('userId', '==', req.user.uid).limit(1).get();
 
 		req.user.handle = user.docs[0].data().handle;
+		req.user.userImageUrl = user.docs[0].data().imageUrl;
 
 		return next();
 	} catch (err) {

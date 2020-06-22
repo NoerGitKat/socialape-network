@@ -15,8 +15,12 @@ const validateUserDetails = [
 	check('website').isURL().withMessage('Your website should have a valid URL!'),
 	check('location').isLength({ min: 3 }).withMessage('Your address should have at least 3 characters!'),
 ];
+const validateComment = [
+	check('comment').isLength({ min: 3 }).withMessage('Your comment should have at least 3 characters!'),
+];
 
 exports.validateLogin = validateLogin;
 exports.validateSignup = validateSignup;
 exports.validateScream = validateScream;
 exports.validateUserDetails = validateUserDetails;
+exports.validateComment = validateComment;

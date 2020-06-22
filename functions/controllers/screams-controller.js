@@ -42,5 +42,76 @@ const createScream = async (req, res) => {
 	}
 };
 
+const getSingleScream = async (req, res) => {
+	const { screamId } = req.params;
+
+	try {
+		let screamData = {};
+		// First get scream data
+		const screamDoc = await admin.firestore().doc(`/screams/${screamId}`).get();
+		if (!screamDoc.exists) {
+			return res.status(404).json({ message: "Couldn't find scream!" });
+		}
+		screamData = screamDoc.data();
+		screamData.screamId = screamDoc.id;
+
+		// Then add comments to screamData
+		const commentsCollection = await admin
+			.firestore()
+			.collection('comments')
+			.orderBy('createdAt', 'desc')
+			.where('screamId', '==', screamId)
+			.get();
+
+		screamData.comments = [];
+		commentsCollection.forEach((doc) => {
+			screamData.comments.push(doc.data());
+		});
+
+		return res.status(201).json(screamData);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json(err);
+	}
+};
+
+const createComment = async (req, res) => {
+	const { screamId } = req.params;
+	const { handle, userImageUrl } = req.user;
+	const { comment } = req.body;
+
+	// Validation
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+
+	const newComment = {
+		body: comment,
+		createdAt: new Date().toISOString(),
+		screamId,
+		handle,
+		userImageUrl,
+	};
+
+	try {
+		// First check if scream doc exists
+		const screamDoc = await admin.firestore().doc(`/screams/${screamId}`).get();
+		if (!screamDoc.exists) {
+			return res.status(404).json({ message: "Couldn't find scream!" });
+		}
+
+		// If exists, add to comments collection
+		const commentsCollection = await admin.firestore().collection('comments').add(newComment);
+
+		return res.status(201).json({ message: 'New comment created!', newComment });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err });
+	}
+};
+
+exports.createComment = createComment;
 exports.getScreams = getScreams;
+exports.getSingleScream = getSingleScream;
 exports.createScream = createScream;

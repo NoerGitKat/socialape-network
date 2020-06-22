@@ -11,7 +11,7 @@ const { validateUserDetails } = require('./../validators');
 const checkAuth = require('./../utils/checkAuth');
 
 userRouter.route('/').get(checkAuth, getUserDetails);
-userRouter.route('/add').post([checkAuth, validateUserDetails, addUserDetails]);
+userRouter.route('/add').post(checkAuth, validateUserDetails, addUserDetails);
 userRouter.route('/upload').post(checkAuth, uploadProfilePic);
 
 module.exports = userRouter;
