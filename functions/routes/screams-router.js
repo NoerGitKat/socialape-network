@@ -9,6 +9,7 @@ const {
 	createComment,
 	likeScream,
 	unlikeScream,
+	deleteScream,
 } = require('./../controllers/screams-controller');
 
 // Validators
@@ -18,6 +19,7 @@ const { validateScream, validateComment } = require('./../validators');
 const checkAuth = require('./../utils/checkAuth');
 
 screamsRouter.route('/').get(getScreams);
+screamsRouter.route('/:screamId/delete').delete(checkAuth, deleteScream);
 screamsRouter.route('/:screamId').get(getSingleScream);
 screamsRouter.route('/:screamId/comment').post(checkAuth, validateComment, createComment);
 screamsRouter.route('/:screamId/like').get(checkAuth, likeScream);

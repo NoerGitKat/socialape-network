@@ -39,7 +39,7 @@ const createScream = async (req, res) => {
 	try {
 		const newScreamDoc = await admin.firestore().collection('screams').add(newScream);
 		newScream.screamId = newScreamDoc.id;
-		return res.json({ message: `Successfully created new document with ID ${newScreamDoc.id}!` });
+		return res.status(201).json({ message: `Successfully created new document with ID ${newScreamDoc.id}!` });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json(err);
@@ -104,6 +104,9 @@ const createComment = async (req, res) => {
 		if (!screamDoc.exists) {
 			return res.status(404).json({ message: "Couldn't find scream!" });
 		}
+
+		// Increment comment count in scream
+		const screamUpdate = await screamDoc.ref.update({ commentCount: screamDoc.data().commentCount + 1 });
 
 		// If exists, add to comments collection
 		const commentsCollection = await admin.firestore().collection('comments').add(newComment);
@@ -201,6 +204,35 @@ const unlikeScream = async (req, res) => {
 	}
 };
 
+const deleteScream = async (req, res) => {
+	const { screamId } = req.params;
+	const { handle } = req.user;
+
+	try {
+		// 1. First find scream in DB
+		const screamDoc = await admin.firestore().doc(`/screams/${screamId}`).get();
+
+		// 2. If found delete scream. Else return 404
+		if (!screamDoc.exists) {
+			return res.status(404).json({ message: 'Scream not found!' });
+		}
+
+		// 3. Check if logged in user equals owner of scream
+		if (screamDoc.data().handle !== handle) {
+			return res.status(401).json({ message: 'User is not authorized!' });
+		}
+
+		// 4. Delete scream
+		await screamDoc.ref.delete();
+
+		return res.status(200).json({ message: 'Scream successfully deleted!' });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err.message });
+	}
+};
+
+exports.deleteScream = deleteScream;
 exports.likeScream = likeScream;
 exports.unlikeScream = unlikeScream;
 exports.createComment = createComment;
