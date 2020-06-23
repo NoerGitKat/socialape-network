@@ -57,7 +57,7 @@ const uploadProfilePic = (req, res) => {
 			return res.status(201).json({ message: 'Image successfully uploaded!' });
 		} catch (err) {
 			console.error(err);
-			return res.status(500).json({ message: err });
+			return res.status(500).json({ message: err.message });
 		}
 	});
 
@@ -83,7 +83,7 @@ const getUserDetails = async (req, res) => {
 		return res.status(200).json(userDetails);
 	} catch (err) {
 		console.error(err);
-		return res.status(500).json({ message: err });
+		return res.status(500).json({ message: err.message });
 	}
 };
 
@@ -109,7 +109,7 @@ const addUserDetails = async (req, res) => {
 		return res.status(201).json({ message: 'User details successfully updated!' });
 	} catch (err) {
 		console.error(err);
-		return res.status(500).json({ message: err });
+		return res.status(500).json({ message: err.message });
 	}
 };
 

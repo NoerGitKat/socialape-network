@@ -2,7 +2,14 @@ const express = require('express');
 const screamsRouter = express.Router();
 
 // Controllers
-const { getScreams, createScream, getSingleScream, createComment } = require('./../controllers/screams-controller');
+const {
+	getScreams,
+	createScream,
+	getSingleScream,
+	createComment,
+	likeScream,
+	unlikeScream,
+} = require('./../controllers/screams-controller');
 
 // Validators
 const { validateScream, validateComment } = require('./../validators');
@@ -13,6 +20,8 @@ const checkAuth = require('./../utils/checkAuth');
 screamsRouter.route('/').get(getScreams);
 screamsRouter.route('/:screamId').get(getSingleScream);
 screamsRouter.route('/:screamId/comment').post(checkAuth, validateComment, createComment);
+screamsRouter.route('/:screamId/like').get(checkAuth, likeScream);
+screamsRouter.route('/:screamId/unlike').get(checkAuth, unlikeScream);
 screamsRouter.route('/new').post(checkAuth, validateScream, createScream);
 
 module.exports = screamsRouter;
