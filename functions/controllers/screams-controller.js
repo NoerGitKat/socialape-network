@@ -123,13 +123,13 @@ const likeScream = async (req, res) => {
 	const { handle } = req.user;
 	try {
 		// 1. Go to database and store scream doc and likes doc in variable
-		const likesDoc = await admin
+		const likesDoc = admin
 			.firestore()
 			.collection('likes')
 			.where('handle', '==', handle)
 			.where('screamId', '==', screamId)
 			.limit(1);
-		const screamDoc = await admin.firestore().doc(`/screams/${screamId}`);
+		const screamDoc = admin.firestore().doc(`/screams/${screamId}`);
 
 		// 2. check if scream doc with given screamId exists, if it does get data
 		let screamData = {};
@@ -166,13 +166,13 @@ const unlikeScream = async (req, res) => {
 
 	try {
 		// 1. Go to db and get like and scream docs
-		const likeDoc = await admin
+		const likeDoc = admin
 			.firestore()
 			.collection('likes')
 			.where('handle', '==', handle)
 			.where('screamId', '==', screamId)
 			.limit(1);
-		const screamDoc = await admin.firestore().doc(`/screams/${screamId}`);
+		const screamDoc = admin.firestore().doc(`/screams/${screamId}`);
 
 		// 2. check if scream doc with given screamId exists, if it does get data
 		let screamData = {};

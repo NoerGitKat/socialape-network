@@ -65,6 +65,54 @@ const uploadProfilePic = (req, res) => {
 };
 
 const getUserDetails = async (req, res) => {
+	const { handle } = req.params;
+
+	console.log('handle', handle);
+
+	let userData = {};
+
+	try {
+		// 1. Get user document from firestore DB
+		const userDoc = await admin.firestore().doc(`/users/${handle}`).get();
+
+		// 2. Return error if no user
+		if (!userDoc.exists) {
+			return res.status(404).json({ message: "User doesn't exist!" });
+		}
+		// 3 Add user from doc
+		userData.user = userDoc.data();
+
+		// 4. Get user's screams from collection
+		const screamsCollection = await admin
+			.firestore()
+			.collection('screams')
+			.where('handle', '==', handle)
+			.orderBy('createdAt', 'desc')
+			.get();
+
+		// 5. Add user's screams from collection
+		userData.screams = [];
+		screamsCollection.forEach((doc) =>
+			userData.screams.push({
+				body: doc.data().body,
+				commentCount: doc.data().commentCount,
+				createdAt: doc.data().createdAt,
+				handle: doc.data().handle,
+				imageUrl: doc.data().imageUrl,
+				likeCount: doc.data().likeCount,
+				screamId: doc.id,
+			})
+		);
+
+		// 6. Respond with user data
+		return res.status(200).json(userData);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err.message });
+	}
+};
+
+const getLoggedInUser = async (req, res) => {
 	const { handle } = req.user;
 	try {
 		let userDetails = {};
@@ -79,6 +127,28 @@ const getUserDetails = async (req, res) => {
 		userDetails.likes = [];
 
 		likesCollection.forEach((doc) => userDetails.likes.push(doc.data()));
+
+		const notificationsCollection = await admin
+			.firestore()
+			.collection('notifications')
+			.where('recipient', '==', handle)
+			.orderBy('createdAt', 'desc')
+			.limit(10)
+			.get();
+
+		userDetails.notifications = [];
+
+		notificationsCollection.forEach((doc) =>
+			userDetails.notifications.push({
+				recipient: doc.data().recipient,
+				sender: doc.data().sender,
+				createdAt: doc.data().createdAt,
+				screamId: doc.data().screamId,
+				type: doc.data().type,
+				read: doc.data().read,
+				notificationId: doc.data().notificationId,
+			})
+		);
 
 		return res.status(200).json(userDetails);
 	} catch (err) {
@@ -113,6 +183,24 @@ const addUserDetails = async (req, res) => {
 	}
 };
 
+const markNotificationsAsRead = async (req, res) => {
+	try {
+		// Create a batch write operation
+		let batch = admin.firestore().batch();
+		req.body.forEach((notificationId) => {
+			const notificationDoc = admin.firestore().doc(`/notifications/${notificationId}`);
+			batch.update(notificationDoc, { read: true });
+		});
+		await batch.commit();
+
+		return res.status(204).json({ message: 'Notifications are now read!' });
+	} catch (err) {
+		console.error(err);
+	}
+};
+
 exports.uploadProfilePic = uploadProfilePic;
-exports.getUserDetails = getUserDetails;
+exports.getLoggedInUser = getLoggedInUser;
 exports.addUserDetails = addUserDetails;
+exports.markNotificationsAsRead = markNotificationsAsRead;
+exports.getUserDetails = getUserDetails;
