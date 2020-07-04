@@ -1,3 +1,5 @@
+const admin = require('firebase-admin');
+
 const createNotificationOnLike = async (snapshot) => {
 	try {
 		const screamDoc = await admin.firestore().doc(`/screams/${snapshot.data().screamId}`).get();

@@ -1,3 +1,5 @@
+const admin = require('firebase-admin');
+
 const deleteScream = async (snapshot, context) => {
 	const { screamId } = context.params;
 
@@ -19,7 +21,7 @@ const deleteScream = async (snapshot, context) => {
 		const likesCollection = await admin.firestore().collection('likes').where('screamId', '==', screamId).get();
 
 		// 5. Delete all likes associated with scream
-		likesCollection.forEach((like) => batch.delete(admin.firestore().doc(`/likes/${comments.id}`)));
+		likesCollection.forEach((like) => batch.delete(admin.firestore().doc(`/likes/${like.id}`)));
 
 		// 6. Get all noticiations associated with scream
 		const notificationsCollection = await admin
@@ -29,8 +31,8 @@ const deleteScream = async (snapshot, context) => {
 			.get();
 
 		// 7. Delete all notifications associated with scream
-		notificationsCollection.forEach((notificaiton) =>
-			batch.delete(admin.firestore().doc(`/notifications/${comments.id}`))
+		notificationsCollection.forEach((notification) =>
+			batch.delete(admin.firestore().doc(`/notifications/${notification.id}`))
 		);
 
 		// 8. Save batch operations

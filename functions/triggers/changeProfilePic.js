@@ -1,3 +1,5 @@
+const admin = require('firebase-admin');
+
 const changeProfilePic = async (change) => {
 	console.log('before', change.before.data());
 	console.log('after', change.after.data());
