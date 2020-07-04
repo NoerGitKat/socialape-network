@@ -8,7 +8,7 @@ const getScreams = async (req, res) => {
 		const screams = [];
 		// Get and push objects in variable
 		const screamDocs = screamsCollection.forEach((doc) => {
-			screams.push({ ...doc.data(), screamId: doc.id });
+			screams.push({ ...doc.data(), screamId: doc.id, userImage: doc.data().userImage });
 		});
 		return res.json(screams);
 	} catch (err) {
