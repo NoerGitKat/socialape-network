@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');x
+const admin = require('firebase-admin');
 
 const deleteNotificationOnUnlike = async (snapshot, context) => {
 	try {
