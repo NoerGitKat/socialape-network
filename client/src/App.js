@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 
 // Components
 import Navbar from './components/Navbar';
@@ -10,7 +11,6 @@ import SignupPage from './pages/signup';
 import LoginPage from './pages/login';
 
 // Styles
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import theme from './styles/theme';
 import './styles/App.scss';
 
